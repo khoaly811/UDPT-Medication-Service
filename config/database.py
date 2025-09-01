@@ -67,7 +67,6 @@ def init_db():
     """
     try:
         # Import all models here to ensure they are registered with Base
-        from src.models.user import User
         from src.models.medicine import Medicine
         from src.models.prescription import Prescription
 

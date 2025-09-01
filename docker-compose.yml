@@ -1,0 +1,20 @@
+name: microservice_medication
+services:
+  fastapi:
+    build: .
+    container_name: microservice_medication
+    ports:
+      - "${APP__PORT:-8011}:8011"
+    environment:
+      DATABASE__URL: postgresql://postgres:postgres@postgres:5432/postgres
+      REDIS__HOST: redis
+      MONGO__HOST: mongo
+      RABBITMQ__HOST: rabbitmq
+    env_file:
+      - .env
+    networks:
+      - shared-project-network
+
+networks:
+  shared-project-network:
+    external: true

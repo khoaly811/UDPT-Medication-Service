@@ -6,7 +6,7 @@ Requirement: Python version <3.12 and >=3.11.0
 
 Install poetry
 ```bash
-python -m pip install poetry==2.1.3
+python -m pip install poetry==2.1.4
 ```
 
 Install dependencies:
