@@ -11,13 +11,14 @@ from src.dto.dispense_dto import (
     DispenseCreateDTO, DispenseLineCreateDTO, DispenseCompleteDTO,
     DispenseResponseDTO, DispenseLineResponseDTO
 )
-from src.messaging.rabbitmq_producer import RabbitMQProducer
+from src.messaging.event_publisher import get_event_publisher
 
 
 class DispenseService:
     def __init__(self, db: Session):
         self.repo = DispenseRepository(db)
         self.prescription_repo = PrescriptionRepository(db)
+        self.event_publisher = get_event_publisher()
 
     # 1) Tạo phiếu cấp phát (PENDING)
     def create_dispense(self, dto: DispenseCreateDTO) -> DispenseResponseDTO:
@@ -104,14 +105,13 @@ class DispenseService:
         self.repo.commit()
 
         try:
-            producer = RabbitMQProducer()
-            producer.publish({
-                "event": "prescription_ready",
-                "prescription_id": str(dispense.prescription_id),
-                "dispense_id": str(dispense.dispense_id),
-                "status": "READY"
+            publisher = get_event_publisher()
+            publisher.publish_ready_prescription({
+                "prescription_id": pres.prescription_id,
+                "prescription_code": pres.prescription_code,
+                "appointment_id": pres.appointment_id,
+                "dispense_id": dispense.dispense_id
             })
-            producer.close()
         except Exception as e:
             print(f"⚠️ RabbitMQ publish failed: {e}")
 

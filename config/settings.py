@@ -44,12 +44,13 @@ class AppConfig(BaseModel):
 
 class RabbitMQConfig(BaseModel):
     """RabbitMQ configuration settings"""
-    host: str = Field(default="rabbitmq")
+    host: str = Field(default="localhost")
     port: int = Field(default=5672, ge=1, le=65535)
-    user: str = Field(default="admin")
-    password: str = Field(default="admin")
-    exchange: str = Field(default="prescription_exchange")
-    queue: str = Field(default="prescription_notifications")
+    username: Optional[str] = Field(default="guest")
+    password: Optional[str] = Field(default="guest")
+    virtual_host: str = Field(default="/")
+    exchange_name: str = Field(default="prescription_exchange")
+    queue_name: str = Field(default="prescription_notifications")
     routing_key: str = Field(default="prescription.ready")
 
 class Settings(BaseModel):
@@ -73,6 +74,9 @@ def get_settings() -> Settings:
     - APP__DEBUG=true
     - DATABASE__URL=postgresql://user:pass@localhost/db
     - REDIS__HOST=redis-server
+    - RABBITMQ__HOST=rabbitmq-server
+    - RABBITMQ__USERNAME=admin
+    - RABBITMQ__PASSWORD=password123
     """
     # Load database URL with multiple fallbacks
     database_url = (
@@ -108,12 +112,13 @@ def get_settings() -> Settings:
             password=os.getenv("MONGO__PASSWORD"),
         ),
         rabbitmq=RabbitMQConfig(
-            host=os.getenv("RABBITMQ__HOST", "rabbitmq"),
+            host=os.getenv("RABBITMQ__HOST", "localhost"),
             port=int(os.getenv("RABBITMQ__PORT", "5672")),
-            user=os.getenv("RABBITMQ__USER", "admin"),
-            password=os.getenv("RABBITMQ__PASSWORD", "admin"),
-            exchange=os.getenv("RABBITMQ__EXCHANGE", "prescription_exchange"),
-            queue=os.getenv("RABBITMQ__QUEUE", "prescription_notifications"),
+            username=os.getenv("RABBITMQ__USERNAME", "guest"),
+            password=os.getenv("RABBITMQ__PASSWORD", "guest"),
+            virtual_host=os.getenv("RABBITMQ__VIRTUAL_HOST", "/"),
+            exchange_name=os.getenv("RABBITMQ__EXCHANGE_NAME", "prescription_exchange"),
+            queue_name=os.getenv("RABBITMQ__QUEUE_NAME", "prescription_notifications"),
             routing_key=os.getenv("RABBITMQ__ROUTING_KEY", "prescription.ready"),
         )
     )
