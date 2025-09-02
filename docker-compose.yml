@@ -10,6 +10,7 @@ services:
       REDIS__HOST: redis
       MONGO__HOST: mongo
       RABBITMQ__HOST: rabbitmq
+      APPOINTMENT__SERVICE__ENDPOINT: http://fastapi:8005
     env_file:
       - .env
     networks:

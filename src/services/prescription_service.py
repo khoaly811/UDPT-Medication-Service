@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 import httpx
@@ -15,7 +17,8 @@ from src.dto.prescription_dto import (
     CancelPrescriptionDTO,
 )
 
-APPOINTMENT_SERVICE_URL = "http://localhost:8005"
+APPOINTMENT_SERVICE_URL = str(os.getenv("APPOINTMENT__SERVICE__ENDPOINT", "http://localhost:8005"))
+
 class PrescriptionService:
     def __init__(self, db: Session):
         self.repository = PrescriptionRepository(db)
