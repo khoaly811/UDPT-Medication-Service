@@ -1,5 +1,4 @@
 import os
-
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 import httpx
@@ -18,7 +17,6 @@ from src.dto.prescription_dto import (
 )
 
 APPOINTMENT_SERVICE_URL = str(os.getenv("APPOINTMENT__SERVICE__ENDPOINT", "http://localhost:8005"))
-
 class PrescriptionService:
     def __init__(self, db: Session):
         self.repository = PrescriptionRepository(db)
@@ -32,6 +30,9 @@ class PrescriptionService:
                 raise HTTPException(status_code=404, detail="Appointment not found")
             if resp.status_code != 200:
                 raise HTTPException(status_code=502, detail="Appointment service error")
+            appointment = resp.json()
+            if appointment.get("status") == "CANCELLED":
+                raise HTTPException(status_code=400, detail="Appointment cancelled")
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"Error contacting Appointment service: {e}")
     # ---------------- Helpers ----------------
